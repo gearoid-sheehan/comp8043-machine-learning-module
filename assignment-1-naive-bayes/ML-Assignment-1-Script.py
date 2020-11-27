@@ -287,10 +287,11 @@ def evalutation_of_results(training_data, training_labels, minimum_word_occuranc
              
             #Run target data and predicted labels list through confusion matrix and append results
             C = metrics.confusion_matrix(target[train_index], predicted_labels)
+            
             true_pos.append(C[0,0])            
             true_neg.append(C[1,1])                        
             false_pos.append(C[1,0])            
-            false_neg.append(C[0,1]) 
+            false_neg.append(C[0,1])
        
             accuracy_avg_train.append(accuracy_score(target[train_index], predicted_labels))
             #Print Accuracy Score to console
@@ -309,52 +310,52 @@ def evalutation_of_results(training_data, training_labels, minimum_word_occuranc
         print('False positive:', np.sum(false_pos) / len(df.index) * (100 / 1), '%')        
         print('False negative:', np.sum(false_neg) / len(df.index) * (100 / 1), '%')        
         print()        
+     
     
-    
-    #Retrieve Optimal Word Length
-    highest_accuracy = max(accuracy_list)
-    optimal_word_length = (accuracy_list.index(highest_accuracy) + 1)
-    print('\nOptimal Word Length: ' + str(optimal_word_length))
-    
-    #Run KFold on Test List with Optimal word length
-    word_list = extract_relevant_features(training_data, k, minimum_word_occurance)
-    dictionaries = count_feature_frequencies(training_data, training_labels, word_list, optimal_word_length, minimum_word_occurance)
-    likelihoods_priors = calc_likelihoods_priors(labels_positive_train, labels_negative_train, dictionaries[0], dictionaries[1])
-    
-    #Loop through each train and/or test index for each split 
-    for train_index, test_index in kf.split(data, target):
-    
-        #List for predicted labels from the data source
-        predicted_labels = []
+        #Retrieve Optimal Word Length
+        highest_accuracy = max(accuracy_list)
+        optimal_word_length = (accuracy_list.index(highest_accuracy) + 1)
+        print('\nOptimal Word Length: ' + str(optimal_word_length))
         
-        #Loop through test index and add each sentiment result from classifier to predicted labels list
-        for x in test_index:
-            outcome = max_likelihood_classification(likelihoods_priors[0], likelihoods_priors[1], likelihoods_priors[2], likelihoods_priors[3], str(df['Review'].values[x]))
-            predicted_labels.append(outcome[0])
-         
-        #Run target data and predicted labels list through confusion matrix and append results
-        C = metrics.confusion_matrix(target[test_index], predicted_labels)
-        true_pos.append(C[0,0])            
-        true_neg.append(C[1,1])                        
-        false_pos.append(C[1,0])            
-        false_neg.append(C[0,1]) 
+        #Run KFold on Test List with Optimal word length
+        word_list = extract_relevant_features(training_data, k, minimum_word_occurance)
+        dictionaries = count_feature_frequencies(training_data, training_labels, word_list, optimal_word_length, minimum_word_occurance)
+        likelihoods_priors = calc_likelihoods_priors(labels_positive_train, labels_negative_train, dictionaries[0], dictionaries[1])
         
-        accuracy_avg_test.append(accuracy_score(target[train_index], predicted_labels))
-        #Print Accuracy Score to console
-        accuracy = accuracy_score(target[train_index], predicted_labels)
-        print('Accuracy Score for word length ' + str(k) + ':', accuracy)
-        accuracy_list.append(accuracy)
+        #Loop through each train and/or test index for each split 
+        for train_index, test_index in kf.split(data, target):
         
-    mean_accuracy_test = sum(accuracy_avg_test) / len(accuracy_avg_test)
-    print('Mean accuracy for test sample: ', mean_accuracy_test)
-    
-    #Print to console each result count as a percentage
-    print('\nRESULTS')
-    print('True positive:', (np.sum(true_pos) / len(df.index)) * (100 / 1), '%')        
-    print('True negative:', np.sum(true_neg) / len(df.index) * (100 / 1), '%')        
-    print('False positive:', np.sum(false_pos) / len(df.index) * (100 / 1), '%')        
-    print('False negative:', np.sum(false_neg) / len(df.index) * (100 / 1), '%')        
-    print()        
+            #List for predicted labels from the data source
+            predicted_labels = []
+            
+            #Loop through test index and add each sentiment result from classifier to predicted labels list
+            for x in test_index:
+                outcome = max_likelihood_classification(likelihoods_priors[0], likelihoods_priors[1], likelihoods_priors[2], likelihoods_priors[3], str(df['Review'].values[x]))
+                predicted_labels.append(outcome[0])
+             
+            #Run target data and predicted labels list through confusion matrix and append results
+            C = metrics.confusion_matrix(target[test_index], predicted_labels)
+            true_pos.append(C[0,0])            
+            true_neg.append(C[1,1])                        
+            false_pos.append(C[1,0])            
+            false_neg.append(C[0,1]) 
+            
+            accuracy_avg_test.append(accuracy_score(target[train_index], predicted_labels))
+            #Print Accuracy Score to console
+            accuracy = accuracy_score(target[train_index], predicted_labels)
+            print('Accuracy Score for word length ' + str(k) + ':', accuracy)
+            accuracy_list.append(accuracy)
+            
+        mean_accuracy_test = sum(accuracy_avg_test) / len(accuracy_avg_test)
+        print('Mean accuracy for test sample: ', mean_accuracy_test)
+        
+        #Print to console each result count as a percentage
+        print('\nRESULTS')
+        print('True positive:', (np.sum(true_pos) / len(df.index)) * (100 / 1), '%')        
+        print('True negative:', np.sum(true_neg) / len(df.index) * (100 / 1), '%')        
+        print('False positive:', np.sum(false_pos) / len(df.index) * (100 / 1), '%')        
+        print('False negative:', np.sum(false_neg) / len(df.index) * (100 / 1), '%')        
+        print()        
     
 """
 DRIVER CODE AND MAIN FOR EACH TASK
