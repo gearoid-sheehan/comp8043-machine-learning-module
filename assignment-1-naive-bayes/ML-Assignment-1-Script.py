@@ -294,6 +294,7 @@ def evalutation_of_results(training_data, training_labels, minimum_word_occuranc
             false_neg.append(C[0,1])
        
             accuracy_avg_train.append(accuracy_score(target[train_index], predicted_labels))
+            
             #Print Accuracy Score to console
             accuracy = accuracy_score(target[train_index], predicted_labels)
             print('Accuracy Score for word length ' + str(k) + ':', accuracy)
